@@ -8,31 +8,25 @@ export default function EventsCalendar({events, ...rest}){
 
     const [ items, setItems ] = useState([])
     const [ childHeight, setChildHeight ] = useState(900)
+    const [ itemHeight, setItemHeight ] = useState(0)
 
     useEffect(() => {
         setItems(groupEvents(events))
+        setItemHeight(50)
     }, [events])
     
 
-    const calculatePosition = (g, e = null) => {
-                
-        if(!e){                         
-            let start = moment(g.start, 'hh:mm a')            
-            let first = !e ? moment("12:00 AM", 'hh:mm a') : moment(g.start, 'hh:mm a')            
-            let duration2 = moment.duration(start.diff(first));
-            duration2 = duration2.asMinutes()                   
-            return {left: duration2 * 3, top: 0, position: "absolute"};
-        }else{
-            let start = moment(e.start, 'hh:mm a')
-            let end = moment(e.end, 'hh:mm a')
-            let first = !e ? moment("12:00 AM", 'hh:mm a') : moment(g.start, 'hh:mm a')
-            let duration = moment.duration(end.diff(start));
-            duration = duration.asMinutes()
-            let duration2 = moment.duration(start.diff(first));
-            duration2 = duration2.asMinutes()                   
-            return {width: (duration) * 3,  marginLeft: duration2 * 3, }
-        }
+    const calculatePosition = (g, k) => {       
+        let start = moment(g.start, 'hh:mm a')
+        let end = moment(g.end, 'hh:mm a')
+        let first = moment("12:00 AM", 'hh:mm a')
+        let duration = moment.duration(end.diff(start));
+        duration = duration.asMinutes()
+        let duration2 = moment.duration(start.diff(first));
+        duration2 = duration2.asMinutes()                   
+        return {width: (duration) * 3, top: !k ? 0 : (k * (itemHeight + 5)),  left: duration2 * 3, position: "absolute"}
     }
+    
 
     const handleLayout = (e) => {    
         var {height} = e.nativeEvent.layout;
@@ -54,18 +48,17 @@ export default function EventsCalendar({events, ...rest}){
 
             <ScrollView 
                     style={{...styles.calendar}} 
-                    contentContainerStyle={{ height: childHeight }}
+                    contentContainerStyle={{ height: items?.length * (itemHeight + 10) }}
                     nestedScrollEnabled={true}
                     scrollEventThrottle={16}
                 >
                 {items?.map((item, k) =>
-                <View key={k} onLayout={handleLayout} style={{ ...calculatePosition(item)}}>
-                    {item?.events?.map((event, e) =>
-                    <View key={e} style={{...styles.event, backgroundColor: event?.color, ...calculatePosition(item, event)}}>
-                        <Text>{`${event?.start + " - " + event?.end}`}</Text>
-                        <Text>{event?.title} - ({event?.group})</Text>
-                        {/* <Text>{event?.subtitle}</Text> */}
-                    </View>
+                <View key={k} onLayout={handleLayout} style={{ ...styles.group}}>
+                    {item?.map((event, e) =>
+                        <View key={e} style={{...styles.event, height: itemHeight, backgroundColor: event?.color, ...calculatePosition(event,  k ) }}>
+                            <Text>{`${event?.start + " - " + event?.end}`}</Text>
+                            {/* <Text>{event?.title}</Text> */}
+                        </View>
                     )}
                 </View>
                 )}
@@ -91,11 +84,10 @@ const styles = StyleSheet.create({
     text:{
         textAlign: 'center'
     },
-    event:{
-        marginVertical: 5,
-        padding: 15,
-        marginHorizontal: 1,
-        borderRadius: 5,
+    event:{        
+        padding: 10,
+        marginHorizontal: 1,        
+        borderRadius: 5,        
 
     },
     calendar: {
@@ -108,5 +100,8 @@ const styles = StyleSheet.create({
         top: 0,        
         bottom: 0,
         right: 0,
+    },
+    group: {
+        // flexDirection: 'row'
     }
 })
