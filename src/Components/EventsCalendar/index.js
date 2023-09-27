@@ -1,9 +1,9 @@
 import React, { useState, useEffect} from "react"
-import { View, ScrollView, StyleSheet, Text} from 'react-native'
+import { View, ScrollView, StyleSheet, Text, TouchableWithoutFeedback, TouchableOpacity} from 'react-native'
 import { getTimes, groupEvents } from "../../utils"
 import moment from "moment"
 
-export default function EventsCalendar({events, ...rest}){
+export default function EventsCalendar({events, onTap, ...rest}){
 
 
     const [ items, setItems ] = useState([])
@@ -56,7 +56,9 @@ export default function EventsCalendar({events, ...rest}){
                 <View key={k} onLayout={handleLayout} style={{ ...styles.group}}>
                     {item?.map((event, e) =>
                         <View key={e} style={{...styles.event, height: itemHeight, backgroundColor: event?.color, ...calculatePosition(event,  k ) }}>
+                            <TouchableOpacity style={{ width: '100%' }} onPress={() => onTap(event)}>
                             <Text>{`${event?.start + " - " + event?.end}`}</Text>
+                            </TouchableOpacity>
                             {/* <Text>{event?.title}</Text> */}
                         </View>
                     )}

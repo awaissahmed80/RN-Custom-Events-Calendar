@@ -32,7 +32,8 @@ export default function App(){
             <View style={styles.container}>
                 <CalendarStrip value={currentDate} onChange={(val) => setCurrentDate(val)} />
                 <Groups  values={groups} onChange={(values) => setGroups(values)}  />                
-                <EventsCalendar                        
+                <EventsCalendar  
+                    onTap = {(e) => console.log("Value", e) }                      
                     events={filtered}                
                 />
             </View>
